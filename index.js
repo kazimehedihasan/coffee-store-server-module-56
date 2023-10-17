@@ -32,6 +32,8 @@ async function run() {
    
     const coffeeCollection = client.db('coffeeDB').collection('coffee');
 
+    const userCollection = client.db('userDB').collection('user');
+
  // data ke dekhar jonno
  app.get('/coffee', async(req, res) => {
   const cursor = coffeeCollection.find();
@@ -90,6 +92,39 @@ app.delete('/coffee/:id', async(req, res) => {
   res.send(request)
 })
 
+// user related apis
+
+app.get('/user', async (req, res) => {
+  const cursor = userCollection.find();
+  const users = await cursor.toArray();
+  res.send(users)
+})
+
+
+app.post('/user', async (req, res) => {
+  const user = req.body;
+  console.log(user);
+  const result = await userCollection.insertOne(user)
+  res.send(result)
+})
+
+app.patch('/user', async (req, res) => {
+  const user = res.body;
+  const filter = {email: user.email}
+  const updateDoc = {
+    $set:{
+      lastLoggedAt: user.lastLoggedAt
+    }
+  }
+  const result = await userCollection.updateOne(filter, updateDoc)
+  res.send(result)
+})
+app.delete('/user/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = {_id: new ObjectId(id)};
+  const result = await userCollection.deleteOne(query);
+  res.send(result)
+})
 
 
 
